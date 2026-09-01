@@ -1,0 +1,7 @@
+node_modules/
+dist/
+coverage/
+*.log
+.DS_Store
+# 本地上下文画像（用户私有，不入库）
+context_profile.json
