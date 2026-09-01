@@ -15,6 +15,7 @@ import {
   parseWorksheet,
   profileTemplate,
   recipeTemplate,
+  recommend,
   renderRawConditions,
   renderReport,
   RULES,
@@ -223,6 +224,7 @@ async function cmdWizard(positionals: string[], flags: CliFlags): Promise<void> 
   console.log(renderReport(report, flags.format));
   console.log("\n======================== 引导补充 ========================");
 
+  const profile = loadProfile(flags.profile);
   const rl = createInterface({ input, output });
   const answers: Array<{ id: string; text: string; answer: string }> = [];
   const questions = report.questions;
@@ -230,12 +232,17 @@ async function cmdWizard(positionals: string[], flags: CliFlags): Promise<void> 
     console.log(`\n【${q.ruleId ?? "完整性"}】${q.text}`);
     if (q.options?.length) {
       q.options.forEach((o, i) => console.log(`  ${i + 1}. ${o}`));
-      console.log("  (输入数字选择 / 直接输入答案 / 回车跳过)");
+      const rec = recommend(q.id, q.options, profile);
+      console.log(`  推荐：${rec ?? "（无）"}（回车直接接受推荐，或输入修改）`);
     } else {
       console.log("  (直接输入答案，回车跳过)");
     }
     const ans = (await rl.question("> ")).trim();
-    if (ans === "") continue;
+    if (ans === "") {
+      const rec = recommend(q.id, q.options, profile);
+      if (rec) answers.push({ id: q.id, text: q.text, answer: rec });
+      continue;
+    }
     let finalAns = ans;
     if (q.options?.length && /^\d+$/.test(ans)) {
       const idx = Number(ans) - 1;
@@ -255,7 +262,6 @@ async function cmdWizard(positionals: string[], flags: CliFlags): Promise<void> 
   for (const a of answers) filled[a.id] = a.answer;
 
   const recipe = await loadRecipe(flags.recipe);
-  const profile = loadProfile(flags.profile);
 
   let doTranslate = !flags.raw;
   if (!flags.raw && input.isTTY) {

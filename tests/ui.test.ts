@@ -25,6 +25,9 @@ describe("可视化窗口服务端 dispatch", () => {
     expect(Array.isArray(data.slots)).toBe(true);
     expect(data.meta).toHaveProperty("propositionType");
     expect(data.meta).toHaveProperty("structural");
+    // 每个插槽带推荐答案（供前端预填「审阅草案」）。
+    const env = data.slots.find((s: { id: string }) => s.id === "completeness-environment");
+    expect(env).toHaveProperty("recommended");
   });
 
   it("POST /api/analyze 缺 text 返回 400", async () => {

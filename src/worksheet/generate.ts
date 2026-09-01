@@ -1,5 +1,7 @@
-import type { Report, WorksheetSlot } from "../types.js";
+import type { ContextProfile, Report, WorksheetSlot } from "../types.js";
 import type { Recipe } from "../recipe/types.js";
+import { defaultProfile } from "../profile/profile.js";
+import { recommendAnswers } from "./recommend.js";
 import { PROPOSITION_LABEL } from "../engine/run.js";
 
 const FILL = "________";
@@ -40,9 +42,9 @@ export function collectSlots(report: Report, recipe: Recipe): WorksheetSlot[] {
 }
 
 /** 生成可填写的 txt 工作表（嵌入原始指令，编译时可自包含地重建报告）。 */
-export function buildWorksheet(report: Report, recipe: Recipe): string {
+export function buildWorksheet(report: Report, recipe: Recipe, profile: ContextProfile = defaultProfile()): string {
   const original = report.optimizedPrompt.taskDescription;
-  const slots = collectSlots(report, recipe);
+  const slots = recommendAnswers(collectSlots(report, recipe), profile);
   const completeness = slots.filter((s) => s.group === "completeness");
   const questions = slots.filter((s) => s.group === "question");
 
@@ -64,6 +66,7 @@ export function buildWorksheet(report: Report, recipe: Recipe): string {
     for (const s of completeness) {
       L.push(`[${s.id}] ${s.label}：${FILL}`);
       if (s.options?.length) L.push(`  选项：${s.options.join(" / ")}`);
+      if (s.recommended) L.push(`  建议：${s.recommended}`);
     }
     L.push("");
   }
@@ -75,6 +78,7 @@ export function buildWorksheet(report: Report, recipe: Recipe): string {
     for (const s of questions) {
       L.push(`[${s.id}] ${s.question}：${FILL}`);
       if (s.options?.length) L.push(`  选项：${s.options.join(" / ")}`);
+      if (s.recommended) L.push(`  建议：${s.recommended}`);
     }
     L.push("");
   }

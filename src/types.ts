@@ -220,6 +220,8 @@ export interface WorksheetSlot {
   question: string;
   options?: string[];
   required: boolean;
+  /** 推荐答案（画像默认 → 首选项），供「审阅草案」而非「面对空白」。仅作可见建议，不静默提交。 */
+  recommended?: string;
 }
 
 /** 填写完毕后的答案：id → 答案文本。 */

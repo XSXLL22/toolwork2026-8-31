@@ -164,6 +164,7 @@ export const UI_HTML = `<!doctype html>
       input.type = "text";
       input.id = "slot-" + s.id;
       input.placeholder = s.label;
+      if (s.recommended) input.value = s.recommended;
       if (s.options && s.options.length) {
         var dl = document.createElement("datalist");
         dl.id = "dl-" + s.id;

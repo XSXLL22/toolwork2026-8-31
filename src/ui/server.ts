@@ -5,6 +5,7 @@ import { parseRecipe } from "../recipe/schema.js";
 import { loadRecipe } from "../recipe/load.js";
 import { analyze } from "../engine/run.js";
 import { collectSlots } from "../worksheet/generate.js";
+import { recommendAnswers } from "../worksheet/recommend.js";
 import { compileWorksheet, renderRawConditions } from "../worksheet/compile.js";
 import { loadProfile } from "../profile/profile.js";
 import { UI_HTML } from "./html.js";
@@ -56,7 +57,7 @@ async function handleAnalyze(body: string): Promise<UiDispatchResult> {
     const profile = loadProfile(undefined);
     const recipeObj = await resolveRecipe(recipe);
     const report = analyze(text, { depth: normalizeDepth(depth), profile });
-    const slots = collectSlots(report, recipeObj);
+    const slots = recommendAnswers(collectSlots(report, recipeObj), profile);
     return json({
       slots,
       meta: {

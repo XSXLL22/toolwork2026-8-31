@@ -64,6 +64,9 @@ export { buildWorksheet, collectSlots } from "./worksheet/generate.js";
 export { parseWorksheet, extractOriginal } from "./worksheet/parse.js";
 export { compileWorksheet, renderRawConditions } from "./worksheet/compile.js";
 export { translateDefault } from "./worksheet/translate.js";
+export { recommend, recommendAnswers } from "./worksheet/recommend.js";
+export { reviewAnswers, appendOpenRisks } from "./worksheet/review.js";
+export type { AnswerRisk, OpenRisks } from "./worksheet/review.js";
 
 export { startUi, openBrowser } from "./ui/app.js";
 export type { StartUiOptions, UiHandle } from "./ui/app.js";
